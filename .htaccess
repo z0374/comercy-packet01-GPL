@@ -1,0 +1,15 @@
+RewriteEngine On
+
+# Impede a listagem de diretórios por segurança
+Options -Indexes
+
+# Define a base para as reescritas
+RewriteBase /
+
+# Se o arquivo ou diretório solicitado existir fisicamente, acesse-o diretamente
+# Isso permite que os assets dos submódulos (src/public/...) sejam carregados
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Caso contrário, redirecione tudo para o index.php
+RewriteRule ^(.*)$ index.php [L,QSA]
