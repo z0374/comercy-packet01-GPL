@@ -3,11 +3,10 @@ RewriteEngine On
 # Impede a listagem de diretórios por segurança
 Options -Indexes
 
-# Define a base para as reescritas
-RewriteBase /
+# Descomente e ajuste a linha abaixo se o servidor de produção exigir uma base específica
+# RewriteBase /
 
 # Se o arquivo ou diretório solicitado existir fisicamente, acesse-o diretamente
-# Isso permite que os assets dos submódulos (src/public/...) sejam carregados
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 

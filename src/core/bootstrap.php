@@ -1,19 +1,34 @@
 <?php
 // src/core/bootstrap.php
 
-// Definir as constantes de caminho para navegação consistente
+// =================================================================
+// 1. DEFINIÇÃO DE CONSTANTES E AMBIENTE
+// =================================================================
+define("BASE_PATH", dirname(__DIR__));
+define("PUBLIC_PATH", BASE_PATH . "/public");
 define("CORE_PATH", __DIR__);
-define("PUBLIC_PATH", ROOT_PATH . "/src/public");
 
-// Iniciar a sessão e configurar a variável de estado principal
+// Informa os submódulos que estão a rodar dentro do ecossistema principal
+define("WARANAS_MASTER_CORE", true);
+
+// =================================================================
+// 2. SESSÃO E VARIÁVEIS DE ESTADO
+// =================================================================
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
-    // Estabelece a variável principal de gestão de estado do utilizador
+
+    // Variável principal de estado que você renomeou recentemente
     if (!isset($_SESSION["SESSION"])) {
         $_SESSION["SESSION"] = [];
     }
 }
 
-// Carregar as dependências funcionais do núcleo
+// =================================================================
+// 3. EXECUÇÃO DO NÚCLEO (ESCOPO GLOBAL)
+// =================================================================
+
+// O Router processa a URL e cria $basePath e $targetFile
+require_once CORE_PATH . "/router.php";
+
+// O Render valida a segurança e faz o require cru do template final
 require_once CORE_PATH . "/render.php";
-require_once CORE_PATH . "/router.php"; 
