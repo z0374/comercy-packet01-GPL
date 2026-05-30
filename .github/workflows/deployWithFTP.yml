@@ -1,0 +1,113 @@
+name: Deploy via FTP
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout + Submódulos
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive 
+          token: ${{ secrets.PATH_TOKEN }}
+
+      # 2. Atualizar Submódulos
+      - name: Atualizar Submódulos
+        run: |
+          git submodule update --remote --recursive
+
+      # 3. Limpeza Radical
+      - name: Excluir pastas BOT locais
+        run: |
+          echo "🧹 Iniciando limpeza..."
+          find . -type d -iname "bot" -print -exec rm -rf {} +
+
+     # 4. Definir Variáveis de Ambiente Dinâmicas
+      - name: Definir Variáveis de Ambiente
+        run: |
+          # Detecta o sufixo com base na branch
+          BRANCH_SUFFIX=$(echo "${{ github.ref_name }}" | tr '[:lower:]' '[:upper:]')
+          
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            echo "FTP_TARGET=${{ secrets.FTP_DIR_MAIN }}" >> $GITHUB_ENV
+            echo "FTP_HOST=${{ secrets.FTP_HOST_MAIN }}" >> $GITHUB_ENV
+            echo "FTP_USER=${{ secrets.FTP_USER_MAIN }}" >> $GITHUB_ENV
+            echo "FTP_PASS=${{ secrets.FTP_PASSWORD_MAIN }}" >> $GITHUB_ENV
+            # Variáveis para o .env
+            echo "CONFIG_URL=${{ secrets.CONFIG_URL_MAIN }}" >> $GITHUB_ENV
+            echo "CONFIG_AUTH=${{ secrets.CONFIG_AUTH_MAIN }}" >> $GITHUB_ENV
+            echo "CONFIG_PAGE=${{ secrets.CONFIG_PAGE_MAIN }}" >> $GITHUB_ENV
+          else
+            echo "FTP_TARGET=${{ secrets.FTP_DIR_DEVELOP }}" >> $GITHUB_ENV
+            echo "FTP_HOST=${{ secrets.FTP_HOST_DEVELOP }}" >> $GITHUB_ENV
+            echo "FTP_USER=${{ secrets.FTP_USER_DEVELOP }}" >> $GITHUB_ENV
+            echo "FTP_PASS=${{ secrets.FTP_PASSWORD_DEVELOP }}" >> $GITHUB_ENV
+            # Variáveis para o .env
+            echo "CONFIG_URL=${{ secrets.CONFIG_URL_DEVELOP }}" >> $GITHUB_ENV
+            echo "CONFIG_AUTH=${{ secrets.CONFIG_AUTH_DEVELOP }}" >> $GITHUB_ENV
+            echo "CONFIG_PAGE=${{ secrets.CONFIG_PAGE_DEVELOP }}" >> $GITHUB_ENV
+          fi
+
+      # 5. Criar arquivo .env dinâmico em /src/config/
+      - name: Criar arquivo .env
+        run: |
+          # Garante que o diretório existe
+          mkdir -p src/config
+          
+          # Cria o arquivo com o conteúdo PHP e as variáveis
+          cat <<EOF > src/config/.env
+          <?php
+              http_response_code(403);
+              exit("Acesso negado.");
+          ?>
+          
+          #Config Tokens
+          
+          config_url = ${{ env.CONFIG_URL }}
+          config_auth = ${{ env.CONFIG_AUTH }}
+          config_page = ${{ env.CONFIG_PAGE }}
+          EOF
+          
+          echo "✅ Arquivo .env criado em src/config/ para a branch ${{ github.ref_name }}"
+
+      # 6. Instalar lftp
+      - name: Instalar lftp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      # 7. Deploy via FTP
+      - name: Deploy via FTP
+        run: |
+          echo "🚀 Enviando branch ${{ github.ref_name }} para: $FTP_TARGET"
+          
+          lftp -e "
+            set ftp:use-feat no;
+            set ssl:verify-certificate no;
+            set ftp:chmod no;
+            set mirror:set-permissions no;
+            
+            open ftp://$FTP_HOST;
+            user $FTP_USER $FTP_PASS;
+            
+            mirror -R --verbose --parallel=10 --delete \
+              --exclude-glob .git \
+              --exclude-glob .git/** \
+              --exclude-glob .github/ \
+              --exclude-glob .vscode/ \
+              --exclude-glob **/.DS_Store \
+              --exclude .*/[Bb][Oo][Tt]/.* \
+              --exclude .*/[Bb][Oo][Tt]$ \
+              ./ $FTP_TARGET;
+            
+            quit
+          "
