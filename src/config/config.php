@@ -17,9 +17,7 @@ if (basename(path: __FILE__) == basename(path: $_SERVER["SCRIPT_FILENAME"])) {
 function fetchData(array $apiParams)
 {
     // 1. Resolve o caminho do ficheiro de ambiente
-    $envFile = defined("ROOT_PATH_COMMERCE")
-        ? ROOT_PATH_COMMERCE . "/config/.env"
-        : dirname(ROOT_PATH, 2) . "/config/.env";
+    $envFile = dirname(ROOT_PATH, 2) . "/config/.env";
 
     if (!file_exists($envFile)) {
         $envFile = ROOT_PATH_COMMERCE . "/.env";
