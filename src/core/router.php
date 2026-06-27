@@ -9,7 +9,7 @@ $path = trim($path, "/");
 // Mapear o módulo para o diretório correto nos submódulos
 $moduleMap = [
     "home" => PUBLIC_PATH . "/commerce",
-      'portal'          => PUBLIC_PATH . '/portal/TEMPLATE',
+    "portal" => PUBLIC_PATH . '/portal/TEMPLATE',
     "catalogo" => PUBLIC_PATH . "/catalog",
 ];
 
