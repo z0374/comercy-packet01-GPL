@@ -19,7 +19,7 @@ $targetFile = "";
 
 // 1. REGRA DA RAIZ: Se o caminho estiver vazio (acessou apenas /)
 if (empty($path)) {
-    $basePath = $moduleMap["commerce"];
+    $basePath = $moduleMap["home"];
     $targetFile = "/index.php";
 } else {
     // Dividir a rota para identificar o módulo alvo
