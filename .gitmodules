@@ -1,12 +1,15 @@
 [submodule "src/public/commerce"]
 	path = src/public/commerce
 	url = https://github.com/z0374/templateCommerce01-CC-BY-NC.git
+  branch = develop
 [submodule "src/public/portal"]
 	path = src/public/portal
 	url = https://github.com/z0374/Linksfera-GPL.git
+  branch = develop
 [submodule "src/public/catalog"]
 	path = src/public/catalog
 	url = https://github.com/z0374/templateCatalog01-CC-BY-NC.git
+  branch = develop
 [submodule "lib"]
 	path = lib
 	url = https://github.com/z0374/waranas_library.git
