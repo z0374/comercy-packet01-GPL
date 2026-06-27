@@ -36,7 +36,7 @@ if (empty($path)) {
             : "/" . implode("/", array_slice($segments, 1));
     } else {
         // 3. FALLBACK: Envia a requisição inteira para o commerce
-        $basePath = $moduleMap["commerce"];
+        $basePath = $moduleMap["home"];
         $targetFile = "/" . implode("/", $segments);
     }
 }
