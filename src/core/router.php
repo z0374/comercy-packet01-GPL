@@ -8,9 +8,9 @@ $path = trim($path, "/");
 
 // Mapear o módulo para o diretório correto nos submódulos
 $moduleMap = [
-    "commerce" => PUBLIC_PATH . "/commerce",
+    "home" => PUBLIC_PATH . "/commerce",
     "portal" => PUBLIC_PATH . "/portal",
-    "catalog" => PUBLIC_PATH . "/catalog",
+    "catalogo" => PUBLIC_PATH . "/catalog",
 ];
 
 // Inicializa as variáveis de ambiente de roteamento no escopo global
